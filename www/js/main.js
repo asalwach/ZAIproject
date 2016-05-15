@@ -29,6 +29,7 @@ var main = {
 
 		$.getJSON(url, 'q=' + data + "&format=json&diagnostics=true&env=http://datatables.org/alltables.env")
 			.done(function (data) {
+			$("#jsonik").text("json: " + JSON.stringify(data));
 			$("#result").text("" + data.query.results.quote.LastTradePriceOnly);
 		})
 			.fail(function (jqxhr, textStatus, error) {
