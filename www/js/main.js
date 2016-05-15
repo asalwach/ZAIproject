@@ -42,14 +42,9 @@ var main = {
 	rotate: function () {
 	$(document).on("deviceready", function () {
 
-		$('body').on('click', '.extra', function () {
+		$('body').on('click', '.rotate', function () {
 			screen.lockOrientation('landscape');
 		});
-		
-		$('body').on('click', '.extra_r', function () {
-			screen.lockOrientation('portrait');
-		});
-		
 	});
     },
 	
