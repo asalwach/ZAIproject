@@ -6,10 +6,10 @@ var main = {
 		this.simple();
 		this.history();
 		this.rotate();
+		this.favorite();
     },
 
     current: function () {
-    //    $(document).on("deviceready", function () {
 	        $(document).on("pageshow", function (e) {
 				if ($(e.target).attr('id') == 's2') {
 
@@ -32,6 +32,7 @@ var main = {
 											"<td>" + (i+1) + "</td>" +
 											"<td>" + data.query.results.quote[i].symbol + "</td>" +
 											"<td>" + data.query.results.quote[i].LastTradePriceOnly + "</td>" +
+											"<td>" + data.query.results.quote[i].LastTradeDate + "</td>" +
 											"<td>" + data.query.results.quote[i].Change + "</td>" +
 											"<td>" + data.query.results.quote[i].ChangeinPercent + "</td>" +
 										"</tr>");
@@ -43,7 +44,6 @@ var main = {
 					});	
 				}
 		    });
-    //    });
     },
 	
     history: function () {
@@ -54,19 +54,22 @@ var main = {
 	
     simple: function() {
         $('body').on('submit', '.simple form', function(e){
-
+		$("#result").empty();
 		var url = "http://query.yahooapis.com/v1/public/yql";
 		var symbol = $("#symbol").val();
-		var data = encodeURIComponent("select * from yahoo.finance.quotes where symbol in ('TWTR', 'FB', 'GOOGL', 'NFLX')");
-
+		var data = encodeURIComponent("select * from yahoo.finance.quotes where symbol in ('" + symbol + "')");
 		$.getJSON(url, 'q=' + data + "&format=json&diagnostics=true&env=http://datatables.org/alltables.env")
 			.done(function (data) {
-			$("#jsonik").text("json: " + JSON.stringify(data.query.results.quote[2]));
-			$("#result").text("" + data.query.results.quote.LastTradePriceOnly);
+			$("#result").append("Nazwa: " + data.query.results.quote.symbol.toUpperCase() + "<br>" +
+								 "Cena w USD: " + data.query.results.quote.LastTradePriceOnly + "<br>" +
+								 "Data ostatniego notowania: " + data.query.results.quote.LastTradeDate.toString() + "<br>" +
+								 "Zmiana: " + data.query.results.quote.Change.toString() + "<br>" +
+								 "Zmiana w %: " + data.query.results.quote.ChangeinPercent.toString() + "<br>"
+			);
 		})
 			.fail(function (jqxhr, textStatus, error) {
 			var err = textStatus + ", " + error;
-				$("#result").text('Sprawdzenie nieudane: ' + err);
+				$("#result").append('Sprawdzenie nieudane: ' + err);
 		});
 	
         })
@@ -80,18 +83,56 @@ var main = {
 		});
 	});
     },
+
+	favorite: function () {
+		
+		$('body').on('click', '.favorite', function () {
+				var fav_val = $('#favorite').val(); 
+				var add_storgade = localStorage.getItem("myfavorite");
+				
+				if(add_storgade.value != ''){
+				add_storgade = add_storgade + ";" + fav_val;
+				} else {
+					alert('test1');
+					add_storgade = fav_val;
+				}
+				
+				localStorage.setItem("myfavorite", add_storgade);
+            });
+			
+		$('body').on('click', '.del_favorite', function () {
+				localStorage.setItem("myfavorite", ' ');
+				fav_table = [];
+				$("#fav_results").empty();
+				alert("Wyczyszczone");
+            });
+		
+        $(document).on("pageshow", function (e) {
+			
+			var fav_val_read = '';
+			fav_val_read = localStorage.getItem("myfavorite");
+			
+			$("#fav_results").empty();
+			var fav_table = [];
+			fav_table = fav_val_read.split(';');
+			
+			//$('#favorite').val(fav_val_read).change();
+			$('#favorite').empty();
+			$('#favorite').change();
+			
+			fav_table.forEach(function(item){
+				
+				$("#fav_results").append(item.toString());
+				$("#fav_results").append("<P>");
+				
+			})
+			
+					
+        });
+    },	
+	
 	
 };
-
-$(function() {
-  $("#header").hide();
-  setTimeout(hideSplash, 2000);
-});
-
-function hideSplash() {
-  $("#header").show();
-  $.mobile.changePage("#s1", "fade");
-}
 
 $(function() {
 
